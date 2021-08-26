@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-
 app.set("view engine", "ejs");
 
 const urlDatabase = {
@@ -44,6 +43,21 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
+
+app.post("/urls", (req, res) => {
+  console.log(req.body);
+  res.send(generateRandomString());
+});
+
+
+const generateRandomString = function () {
+  const chars = "0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM!#$%&";
+  let random_string = "";
+    for (let i = 0; i < 6; i++) {
+      random_string += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return random_string;
+  };
 
 
 
