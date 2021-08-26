@@ -31,6 +31,7 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
+  
 });
 
 
@@ -52,19 +53,20 @@ app.post("/urls", (req, res) => {
 });
 
 
-app.post("/urls/:shortURL", (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL]);
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
 });
 
 
 const generateRandomString = function () {
   const chars = "0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
   let random_string = "";
-    for (let i = 0; i < 6; i++) {
-      random_string += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    return random_string;
-  };
+  for (let i = 0; i < 6; i++) {
+    random_string += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return random_string;
+};
 
 
 
