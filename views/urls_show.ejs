@@ -17,6 +17,18 @@
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
       </div>
     <div class="card-footer text-muted"></div>
+    <main style=>
+      <h1>Edit</h1>
+      <form class="form-block" action="/urls/<%= shortURL %>" method="POST">
+        <div class="form-group mb-2" style="width: 100%; margin: auto; display:block;">
+          <div style="display: inline">
+            <label for="longURL">New  URL: </label>
+            <input  class="form-control" type="text" name="longURL" value="<%= longURL %>" style="width: 300px; display: inline">
+            <button style="display: inline;" type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+      </form>
+    </main>
   </div>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
