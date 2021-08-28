@@ -24,6 +24,10 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+app.get('/register', (req, res) => {
+  res.render('register', {username: req.cookies.username})
+})
+
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
