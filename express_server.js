@@ -59,10 +59,23 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  let randomID = generateRandomString();
-  users[randomID] = {id:randomID, email:req.body.email, password:req.body.password}
-  res.cookie('user_id', users[randomID]).redirect('/urls');
-})
+  if (!req.body.email || !req.body.password) {
+    res.status(400)
+  }
+  for (let userId in users) {
+    if (users[userId].email === req.body.email) {
+      res.status(400)
+    }
+  }
+  if (400 <= res.statusCode) {
+    res.send('Invalid form')
+  } else {
+    let randomID = generateRandomString();
+    users[randomID] = {id:randomID, email:req.body.email, password:req.body.password}
+    res.cookie('user_id', users[randomID]).redirect('/urls');
+    //console.log(users)
+  }
+ });
 
 
 app.post("/logout", (req, res) => {
