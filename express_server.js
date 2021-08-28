@@ -59,11 +59,10 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new",{username: req.cookies.username });
 });
 
-
 app.post('/register', (req, res) => {
-  let rendomID = generateRandomString();
-  users[rendomID]= {id:rendomID, email:req.body.email, password:req.body.password}
- console.log(users);
+  let randomID = generateRandomString();
+  users[randomID]= {id:randomID, email:req.body.email, password:req.body.password}
+  res.cookie('user_id', randomID).redirect('/urls');
 })
 
 
