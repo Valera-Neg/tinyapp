@@ -1,4 +1,6 @@
 const express = require('express');
+
+
 const app = express();
 const PORT = 8080; //default port 8080
 
@@ -39,7 +41,12 @@ app.get("/", (req, res) => {
 
 app.get('/register', (req, res) => {
   res.render('register',   {user: req.cookies.user_id})
-})
+});
+
+
+app.get('/login', (req, res) => {
+  res.render('login',  { user: req.cookies.user_id });
+});
 
 
 app.get("/hello", (req, res) => {
@@ -94,14 +101,30 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${short}`); 
 });
 
-app.post("/login", (req,res) => {
-  res.cookie('user_id', req.body.email).redirect('/urls')
-});
+app.post("/login", (req,res, next) => {
+
+  if (!req.body.email || !req.body.password) {
+    res.status(400)
+  } else {
+    for (let userId in users) {
+      if (users[userId].email === req.body.email && users[userId].password === req.body.password) {
+        res.status(200).cookie('user_id', users[userId]).redirect('/urls');
+        return;
+      }
+    }
+    res.status(403);
+  }
+  if (res.statusCode === 400) {
+    res.send('Invalid form')
+  } else if (res.statusCode === 403) {
+    res.send('Invalid credentials');
+  }
+ });
 
 app.post("/urls/:shortURL", (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.longURL;
   res.redirect('/urls')
-})
+});
 
 
 app.get("/urls/:shortURL", (req, res) => {
