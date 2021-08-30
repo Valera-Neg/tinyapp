@@ -1,6 +1,6 @@
 const {Model} = require('../Model');
 const assert = require('chai').assert;
-const expect = require('chai').expect
+const expect = require('chai').expect;
 
 const userDb = {
   "FgWRjO": {
@@ -41,7 +41,7 @@ const urlDb = {
 }
 
 let mockModel = new Model(userDb, urlDb)
-let mockService = new Service(mockModel)
+//let mockService = new Service(mockModel)
 
 describe('#createUser()', () => {
   it ("createUser() should create a new user", () =>{
