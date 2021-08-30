@@ -1,4 +1,4 @@
-const {Model} = require('../Model');
+const {Model} = require('../../Model');
 const assert = require('chai').assert;
 const expect = require('chai').expect
 
@@ -42,27 +42,23 @@ const urlDb = {
 
 let mockModel = new Model(userDb, urlDb)
 
-describe('#updateURL()', () => {
-  it ("updateURL() should create URL record", () =>{
-    mockModel.updateURL({shortURL: "b2xVn2", longURL: "http://www.cars.com", userID: 'FgWRjO'});
+describe('#createURL()', () => {
+  it ("createURL() should create URL record", () =>{
+    let newURL = mockModel.createURL('https://gmail.com', 'qnyo09');
     assert.deepEqual(mockModel.readAllURLs(), {
-      "b2xVn2": {longURL:"http://www.cars.com", userID: "FgWRjO"},
+      "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: "FgWRjO"},
       "9sm5xK": {longURL:"http://www.google.com", userID: "qnyo09"},
       "YKrSsX": {longURL:"https://alwaysjudgeabookbyitscover.com/", userID: "rTdakL"},
       "rg4YMw": {longURL:"https://longdogechallenge.com/", userID: "ZGPQm3"},
       "O3YiPY": {longURL:"https://www.flightradar24.com/", userID: "ZGPQm3"},
       "09NSYs": {longURL:"https://oshpark.com/", userID: "FgWRjO"},
       "f2qu0C": {longURL:"http://www.yahoo.com", userID: "FgWRjO"},
+      [newURL.shortURL]: {longURL: newURL.longURL, userID: newURL.userID}
     })
   })
-  it ("updateURL() should attempt to create URL record, but short URL does not exist", () =>{
+  it ("readURL() should attempt to create URL record, and fail", () =>{
     expect(function(){
-      mockModel.updateURL({shortURL: "pppppp", longURL: "http://www.cars.com", userID: 'FgWRjO'});
-    }).to.throw()
-  })
-  it ("updateURL() should attempt to create URL record, but updating owner id fails", () =>{
-    expect(function(){
-      mockModel.updateURL({shortURL: "f2qu0C", longURL:"http://www.yahoo.com", userID: "ppppp"});
+      mockModel.createURL('https://gmail.com', '');
     }).to.throw()
   })
 });

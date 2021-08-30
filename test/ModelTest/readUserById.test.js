@@ -1,4 +1,4 @@
-const {Model} = require('../Model');
+const {Model} = require('../../Model');
 const assert = require('chai').assert;
 const expect = require('chai').expect
 
@@ -42,15 +42,15 @@ const urlDb = {
 
 let mockModel = new Model(userDb, urlDb)
 
-describe('#readURL(shortURL)', () => {
-  it ("readURL() should return a URL object", () =>{
-    assert.deepEqual(mockModel.readURL("O3YiPY"), {
-      shortURL: "O3YiPY",
-      longURL:"https://www.flightradar24.com/",
-      userID: "ZGPQm3"
+describe('#readUserByID()', () => {
+  it ("readUserByID() should return a user object", () =>{
+    assert.deepEqual(mockModel.readUserByID("rTdakL"), {
+      userID: "rTdakL", 
+      email: "caden.white@yahoo.com", 
+      password: "pass3"
     })
   })
-  it ("readURL() should return a URL object but URL does not exist", () =>{
-    assert.deepEqual(mockModel.readURL("ppppppp"), null)
+  it ("readUserByID() should return a user object, but user does not exist", () =>{
+    assert.deepEqual(mockModel.readUserByID("ppppppp"), null)
   })
 });

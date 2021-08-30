@@ -30,7 +30,7 @@
           
           <tr>
            <td><%= Object.keys(urls)[i] %></td>
-           <td><%= urls[Object.keys(urls)[i]] %></td>
+           <td><%= urls[Object.keys(urls)[i]].longURL %></td>
            <td><form id="edit-button-<%= i %>" method="POST" action="/url/<%= Object.keys(urls)[i] %>">
             <button form="edit-button-<%= i %>" type="submit" class="btn btn-outline-warning">Edit</button></td>
           </form>

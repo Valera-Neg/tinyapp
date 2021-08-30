@@ -26,12 +26,17 @@ const users = {
 };
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  // "b2xVn2":"http://www.lighthouselabs.ca",
+  // "9sm5xK":"http://www.google.com"
+  "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: "aJ48lW"},
+  "9sm5xK": {longURL:"http://www.google.com", userID: "aJ48lW"}
 };
+
+
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+  console.log(urlDatabase)
 });
 
 
@@ -55,14 +60,20 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase,  user: req.cookies.user_id};
-  res.render("urls_index", templateVars);
-  
+  if (!req.cookies.user_id) {
+    res.redirect('login')
+   } else { 
+      const templateVars = { urls: urlDatabase,  user: req.cookies.user_id};
+      res.render("urls_index", templateVars);
+  } 
 });
 
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new",  { user: req.cookies.user_id} );
+  if (!req.cookies.user_id) {
+    res.redirect('/login')
+   }else{ res.render("urls_new",  { user: req.cookies.user_id} );
+   }
 });
 
 app.post('/register', (req, res) => {
@@ -80,7 +91,7 @@ app.post('/register', (req, res) => {
     let randomID = generateRandomString();
     users[randomID] = {id:randomID, email:req.body.email, password:req.body.password}
     res.cookie('user_id', users[randomID]).redirect('/urls');
-    //console.log(users)
+  console.log(users)
   }
  });
 
@@ -95,13 +106,17 @@ app.post("/logout", (req, res) => {
 //   res.render("urls_show", templateVars);
 // });
 
+
 app.post("/urls", (req, res) => {
   let short = generateRandomString();
-  urlDatabase[short] = req.body.longURL;
+  urlDatabase[short] = {longURL: req.body.longURL, userID : users.userRandomID.id}
+  console.log(urlDatabase)
   res.redirect(`/urls/${short}`); 
 });
 
-app.post("/login", (req,res, next) => {
+
+
+app.post("/login", (req,res) => {
 
   if (!req.body.email || !req.body.password) {
     res.status(400)
@@ -117,7 +132,7 @@ app.post("/login", (req,res, next) => {
   if (res.statusCode === 400) {
     res.send('Invalid form')
   } else if (res.statusCode === 403) {
-    res.send('Invalid credentials');
+    res.redirect('/register');//only registred users can access App
   }
  });
 
@@ -128,14 +143,15 @@ app.post("/urls/:shortURL", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: req.cookies.user_id };
+ const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: req.cookies.user_id };
   res.render("urls_show", templateVars);
+  
 });
 
 
-app.get("/u/:shortURL", (req, res) => {
+app.get("/u/:shortURL", (req, res) => { //shortURL redirector to longURL
   const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  res.redirect(longURL)
 });
 
 
@@ -149,18 +165,6 @@ app.post('/url/:shortURL/delete', (req, res) => {
 app.post('/url/:shortURL', (req, res) => {
   res.redirect(`/urls/${req.params.shortURL}`);
 })
-
-
-const generateRandomString = function () {
-  const chars = "0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
-  let random_string = "";
-  for (let i = 0; i < 6; i++) {
-    random_string += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return random_string;
-};
-
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

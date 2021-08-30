@@ -1,6 +1,7 @@
-const {Model} = require('../Model');
+const {Model} = require('../../Model');
+const {Service} = require('../../Service');
 const assert = require('chai').assert;
-const expect = require('chai').expect
+const expect = require('chai').expect;
 
 const userDb = {
   "FgWRjO": {
@@ -41,18 +42,5 @@ const urlDb = {
 }
 
 let mockModel = new Model(userDb, urlDb)
-
-describe('#readAllURLs', () => {
-  it ("readAllURLs() should return entire URL database", () =>{
-    assert.deepEqual(mockModel.readAllURLs(), {
-      "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: "FgWRjO"},
-      "9sm5xK": {longURL:"http://www.google.com", userID: "qnyo09"},
-      "YKrSsX": {longURL:"https://alwaysjudgeabookbyitscover.com/", userID: "rTdakL"},
-      "rg4YMw": {longURL:"https://longdogechallenge.com/", userID: "ZGPQm3"},
-      "O3YiPY": {longURL:"https://www.flightradar24.com/", userID: "ZGPQm3"},
-      "09NSYs": {longURL:"https://oshpark.com/", userID: "FgWRjO"},
-      "f2qu0C": {longURL:"http://www.yahoo.com", userID: "FgWRjO"},
-    })
-  })
-});
+let mockService = new Service(mockModel)
 
