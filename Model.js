@@ -65,15 +65,6 @@ class Model {
     return null;
   };
 
-  readUserByPassword(password) {
-    for( let key of Object.keys(this.usersDb)) {
-      if (this.usersDb[key].password === password) {
-        return {userID: this.usersDb[key].userID, email: this.usersDb[key].email, password: this.usersDb[key].password};
-      }
-    }
-    return null;
-  }
-
   /**
    * 
    * @param {string} email 

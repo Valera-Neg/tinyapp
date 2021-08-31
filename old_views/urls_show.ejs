@@ -13,22 +13,17 @@
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <h5 class="card-title">TinyURL for: <a href="/u/<%= url.longURL %>"> <%= url.longURL %></a></h5>
-        <p class="card-text">Short URL: <a href="/u/<%= url.shortURL %>"><%= url.shortURL %></a></p>
+        <h5 class="card-title">TinyURL for: <a href="/u/<%= longURL %>"> <%= longURL %></a></h5>
+        <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
       </div>
     <div class="card-footer text-muted"></div>
     <main style=>
       <h1>Edit</h1>
-      <% if (error) { %>
-        <div class="alert alert-danger" style="width: 30%; margin: auto; margin-bottom: 2em;" role="alert">
-          <%= error %>
-        </div>
-        <% } %>
-      <form class="form-block" action="/url/<%= url.shortURL %>" method="POST">
+      <form class="form-block" action="/urls/<%= shortURL %>" method="POST">
         <div class="form-group mb-2" style="width: 100%; margin: auto; display:block;">
           <div style="display: inline">
             <label for="longURL">New URL: </label>
-            <input  class="form-control" type="text" name="longURL" value="<%= url.longURL %>" style="width: 300px; display: inline">
+            <input  class="form-control" type="text" name="longURL" value="<%= longURL %>" style="width: 300px; display: inline">
             <button style="display: inline;" type="submit" class="btn btn-primary">Submit</button>
           </div>
         </div>

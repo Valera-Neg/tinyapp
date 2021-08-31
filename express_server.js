@@ -1,5 +1,5 @@
 const express = require('express');
-
+const path = require('path');
 
 const app = express();
 const PORT = 8080; //default port 8080
@@ -10,6 +10,7 @@ const cookieParser = require('cookie-parser')
 
 
 app.use(cookieParser())
+app.set('views', path.join(__dirname, '/old_views'));
 app.set("view engine", "ejs");
 
 const users = {
@@ -26,8 +27,6 @@ const users = {
 };
 
 const urlDatabase = {
-  // "b2xVn2":"http://www.lighthouselabs.ca",
-  // "9sm5xK":"http://www.google.com"
   "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: "aJ48lW"},
   "9sm5xK": {longURL:"http://www.google.com", userID: "aJ48lW"}
 };
@@ -145,7 +144,6 @@ app.post("/urls/:shortURL", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: req.cookies.user_id };
   res.render("urls_show", templateVars);
-  
 });
 
 

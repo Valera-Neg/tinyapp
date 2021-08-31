@@ -26,16 +26,16 @@
         </tr>
       </thead>
       <tbody>
-        <% for(let url of urls) { %>
+        <% for(let i = 0; i < Object.keys(urls).length; i++) { %>
           
           <tr>
-           <td><a href="/u/<%= url.shortURL %>"><%= url.shortURL %></a></td>
-           <td><a href="/u/<%= url.shortURL %>"><%= url.longURL %></a></td>
-           <td><form id="edit-button-<%= url.shortURL %>" method="GET" action="/urls/<%= url.shortURL %>">
-            <button form="edit-button-<%= url.shortURL %>" type="submit" class="btn btn-outline-warning">Edit</button></td>
+           <td><%= Object.keys(urls)[i] %></td>
+           <td><%= urls[Object.keys(urls)[i]].longURL %></td>
+           <td><form id="edit-button-<%= i %>" method="POST" action="/url/<%= Object.keys(urls)[i] %>">
+            <button form="edit-button-<%= i %>" type="submit" class="btn btn-outline-warning">Edit</button></td>
           </form>
-           <td><form id="dlt-button-<%= url.shortURL %>" method="POST" action="/url/<%= url.shortURL %>/delete">
-           <button form="dlt-button-<%= url.shortURL %>" type="submit" class="btn btn-outline-danger">Delete</button></td>
+           <td><form id="dlt-button-<%= i %>" method="POST" action="/url/<%= Object.keys(urls)[i] %>/delete">
+           <button form="dlt-button-<%= i %>" type="submit" class="btn btn-outline-danger">Delete</button></td>
           </form>
           </tr>
         <% }  %>

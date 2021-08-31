@@ -1,21 +1,19 @@
 const users = {
-  "userRandomID": {
-    id: "userRandomID", 
+  "b2xVn2": {
+    userID: "b2xVn2", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: "example"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
+ "9sm5xK": {
+    userID: "9sm5xK", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: "example"
   }
 };
 
 const urlDatabase = {
-  // "b2xVn2":"http://www.lighthouselabs.ca",
-  // "9sm5xK":"http://www.google.com"
-  "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: "aJ48lW"},
-  "9sm5xK": {longURL:"http://www.google.com", userID: "aJ48lW"}
+  "k1MjSN": {longURL:"http://www.lighthouselabs.ca", userID: "b2xVn2"},
+  "CvJ0Is": {longURL:"http://www.google.com", userID: "9sm5xK"}
 };
 
 module.exports = { users, urlDatabase };

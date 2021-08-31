@@ -11,18 +11,12 @@
   
   <%- include('partials/_header'); %>
   <div class="container">
-    <!--<h1 class="text-center" style="margin-top: 2em">Login</h1>-->
+    <h1 class=" col-md-4" style="margin-top: 2em">Create Account</h1>
     <div class="row">
      <div class="col-md-4 " style="margin-top: 2em">
        
         <form method="POST">
           <div class="form-group">
-            <h1>Create Account</h1>
-            <% if (error) { %>
-            <div class="alert alert-danger" role="alert">
-              <%= error %>
-            </div>
-            <% } %>
             <label for="exampleInputEmail1">Email address</label>
             <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
             <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
@@ -31,7 +25,7 @@
             <label for="exampleInputPassword1">Password</label>
             <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
           </div>
-          <button type="submit" class="btn btn-primary">Create</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
         </form>
       </div>
     </div>

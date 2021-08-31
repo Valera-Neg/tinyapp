@@ -7,23 +7,23 @@ class Service {
 
   registerNewUser(email, password) {
     if (!email || !password) {
-      throw new ServiceError('email or password are not provided', 400)
+      throw new ServiceError('email or password are not provided', 400, 1)
     }
     try {
       return this.model.createUser(email, password);
     } catch (error) {
-      throw new ServiceError('invalid credentials, email should be unique', 409)
+      throw new ServiceError('invalid credentials, email should be unique', 409, 1)
     }
   };
 
-  authorizeUser(email, password) {
+  loginUser(email, password) {
     let user = this.model.readUserByEmail(email);
     if (!user) {
-      return null;
+      throw new ServiceError('User with this email is not registered', 403, 2);
     } else if (user.password === password) {
       return user;
     } else {
-      return null;
+      throw new ServiceError('Incorrect credentils', 409, 2);
     }
   };
 
@@ -33,9 +33,9 @@ class Service {
 
   createNewURL(longURL, userID) {
     if (!longURL || !userID) {
-      throw new ServiceError ('URL or user ID are not providet', 400)
+      throw new ServiceError ('URL is not provided', 400, 3)
     } else if (!this.model.readUserByID(userID)) {
-      throw new ServiceError ('The client does not have access rights to the content', 403)
+      throw new ServiceError ('The client does not have access rights to the content', 403, 0)
     } else {
       return this.model.createURL(longURL, userID);
     }
@@ -45,14 +45,42 @@ fetchURLByID(userID) {
   return this.model.readURLOfUser(userID);
 };
 
-deleteURL(shortURL) {
+getURL(shortURL) {
+  return this.model.readURL(shortURL);
+}
+
+getURLRestricted(shortURL, userID) {
+  if (!this.isURLOwner(shortURL, userID)) {
+    throw new ServiceError('No access rights', 403, 5)
+  }
+  return this.getURL(shortURL);
+}
+
+deleteURL(shortURL, userID) {
+  if (!this.isURLOwner(shortURL, userID)) {
+    throw new ServiceError('No access rights', 403, 5)
+  }
   return this.model.deletURL(shortURL);
 };
 
 editURL(shortURL, longURL, userID) {
-  return this.model.updateURL({shortURL, longURL, userID})
+  if (!this.isURLOwner(shortURL, userID)) {
+    throw new ServiceError('No access rights', 403, 5)
+  }
+  try {
+    return this.model.updateURL({shortURL, longURL, userID})
+  } catch (error) {
+    throw new ServiceError('URL is not provided', 400, 4)
+  }
 }
 
+isURLOwner(shortURL, userID) {
+  if (this.getURL(shortURL) && this.getURL(shortURL).userID === userID) {
+    return true;
+  } else {
+    return false;
+  }
+}
 };
 
 module.exports = { Service }
