@@ -1,169 +1,128 @@
+/***IMPORTS***/
 const express = require('express');
-const path = require('path');
+const bodyParser = require("body-parser");
+//const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session')
+const {users: userDb, urlDatabase: urlDb} = require('./db')
+const { Model } = require('./Model');
+const { Service } = require('./Service');
+const middlewares = require('./middleware');
+const bcrypt = require('bcrypt');
 
+
+/***INITIALIZING DATABASE AND SERVICE CLASSES***/
+const model = new Model(userDb, urlDb);
+const service = new Service(model);
+
+/***EXPRESS APP INITIALIZATION***/
 const app = express();
 const PORT = 8080; //default port 8080
 
-const bodyParser = require("body-parser");
+/***SETTING UP SOME MIDDLEWARES AND VIEW ENGINE***/
 app.use(bodyParser.urlencoded({extended: true}));
-const cookieParser = require('cookie-parser')
+// app.use(cookieParser())
+//var cookieSession = require('cookie-session')
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'/* secret keys */],
 
+  // Cookie Options
+  maxAge: 2 * 60 * 60 * 1000 // 2 hours
+}))
 
-app.use(cookieParser())
-app.set('views', path.join(__dirname, '/old_views'));
 app.set("view engine", "ejs");
 
-const users = {
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
-  },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "dishwasher-funk"
-  }
-};
-
-const urlDatabase = {
-  "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: "aJ48lW"},
-  "9sm5xK": {longURL:"http://www.google.com", userID: "aJ48lW"}
-};
-
-
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-  console.log(urlDatabase)
-});
-
-
+/***ROUTE HANDLERS***/
+// redirecting from route to /urls
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect('./urls');
 });
 
-app.get('/register', (req, res) => {
-  res.render('register',   {user: req.cookies.user_id})
+/***URL ROUTES***/
+app.get("/urls", middlewares.auth, (req, res) => {
+  res.render("urls_index", {urls: service.fetchURLByID(req.session/*cookies*/.user_id.id),  user: req.session/*cookies*/.user_id, error: null});
 });
 
-
-app.get('/login', (req, res) => {
-  res.render('login',  { user: req.cookies.user_id });
+app.post("/urls", middlewares.auth, (req, res) => {
+  let newURL = service.createNewURL(req.body.longURL, req.session/*cookies*/.user_id.id)
+  res.redirect(`/urls/${newURL.shortURL}`); 
 });
 
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+/***LOGIN ROUTES***/
+app.get('/login', middlewares.notAuth, (req, res) => {
+    res.render('login',  { user: null, error: null });
+});
+app.post("/login", middlewares.notAuth, (req,res) => {
+    let user = service.loginUser(req.body.email, req.body.password);
+    //res.cookie('user_id', {id: user.userID, email:user.email}).redirect('/urls');
+    req.session.user_id = {id: user.userID, email:user.email};
+    res.redirect('/urls')
 });
 
-
-app.get("/urls", (req, res) => {
-  if (!req.cookies.user_id) {
-    res.redirect('login')
-   } else { 
-      const templateVars = { urls: urlDatabase,  user: req.cookies.user_id};
-      res.render("urls_index", templateVars);
-  } 
+/***LOGOUT****/
+app.post("/logout", middlewares.auth, (req, res) => {
+  req.session = null;
+  res.redirect('/urls');
 });
 
-
-app.get("/urls/new", (req, res) => {
-  if (!req.cookies.user_id) {
-    res.redirect('/login')
-   }else{ res.render("urls_new",  { user: req.cookies.user_id} );
-   }
+/***REGISTRATION***/
+app.get('/register', middlewares.notAuth, (req, res) => {
+  res.render('register', {user: null, error: null});
 });
-
-app.post('/register', (req, res) => {
-  if (!req.body.email || !req.body.password) {
-    res.status(400)
-  }
-  for (let userId in users) {
-    if (users[userId].email === req.body.email) {
-      res.status(400)
-    }
-  }
-  if (400 <= res.statusCode) {
-    res.send('Invalid form')
-  } else {
-    let randomID = generateRandomString();
-    users[randomID] = {id:randomID, email:req.body.email, password:req.body.password}
-    res.cookie('user_id', users[randomID]).redirect('/urls');
-  console.log(users)
-  }
- });
-
-
-app.post("/logout", (req, res) => {
-  res.clearCookie('user_id').redirect('/urls');
-});
-
-
-// app.get("/urls/:shortURL", (req, res) => {
-//   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-//   res.render("urls_show", templateVars);
-// });
-
-
-app.post("/urls", (req, res) => {
-  let short = generateRandomString();
-  urlDatabase[short] = {longURL: req.body.longURL, userID : users.userRandomID.id}
-  console.log(urlDatabase)
-  res.redirect(`/urls/${short}`); 
-});
-
-
-
-app.post("/login", (req,res) => {
-
-  if (!req.body.email || !req.body.password) {
-    res.status(400)
-  } else {
-    for (let userId in users) {
-      if (users[userId].email === req.body.email && users[userId].password === req.body.password) {
-        res.status(200).cookie('user_id', users[userId]).redirect('/urls');
-        return;
-      }
-    }
-    res.status(403);
-  }
-  if (res.statusCode === 400) {
-    res.send('Invalid form')
-  } else if (res.statusCode === 403) {
-    res.redirect('/register');//only registred users can access App
-  }
- });
-
-app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
+app.post('/register', middlewares.notAuth, (req, res) => {
+  let user = service.registerNewUser(req.body.email, req.body.password);
+  //res.cookie('user_id', {id: user.userID, email: user.email}).redirect('/urls')
+  req.session.user_id = {id: user.userID, email:user.email};
   res.redirect('/urls')
 });
 
-
-app.get("/urls/:shortURL", (req, res) => {
- const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: req.cookies.user_id };
-  res.render("urls_show", templateVars);
+/***URL CREATION***/
+app.get("/urls/new", middlewares.auth, (req, res) => {
+  res.render("urls_new",  { user: req.session/*cookies*/.user_id, error: null} );
+});
+app.post("/urls/:shortURL", middlewares.auth, (req, res) => {
+  service.createNewURL(req.body.longURL, req.session/*cookies*/.user_id.id)
+  res.redirect('/urls')
 });
 
-
-app.get("/u/:shortURL", (req, res) => { //shortURL redirector to longURL
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL)
+/***URL EDIT***/
+app.get("/urls/:shortURL", middlewares.auth, (req, res, next) => {
+  let url = service.getURLRestricted(req.params.shortURL, req.session/*cookies*/.user_id.id);
+  if (url === null) {
+    next();
+  } else {
+    res.render("urls_show", {url, user: req.session/*cookies*/.user_id, error: null});
+  }
+});
+app.post("/url/:shortURL", middlewares.auth, (req, res) => {
+  req.body.url = { shortURL: req.params.shortURL, longURL: service.getURL(req.params.shortURL).longURL }
+  service.editURL(req.params.shortURL, req.body.longURL, req.session/*cookies*/.user_id.id);
+  res.redirect('/urls')
 });
 
-
-
-
-app.post('/url/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL];
+/***DELETE URL***/
+app.post('/url/:shortURL/delete', middlewares.auth, (req, res) => {
+  service.deleteURL(req.params.shortURL, req.session/*cookies*/.user_id.id)
   res.redirect('/urls');
 })
 
-app.post('/url/:shortURL', (req, res) => {
-  res.redirect(`/urls/${req.params.shortURL}`);
-})
+/***PUBLIC ACCESS REDIRECT***/
+app.get("/u/:shortURL", (req, res, next) => { //shortURL redirector to longURL
+  let url = service.getURL(req.params.shortURL);
+  if (!url) {
+    next()
+  } else {
+    res.redirect(url.longURL);
+  }
+});
 
+/***ERROR HANDLER***/
+app.get('*', (req, res) => {
+  res.status(404).send('404 Page Not Found')
+});
+app.use(middlewares.errorHandler);
+
+/***EXPRESS APP LISTENS ON PORT***/
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });

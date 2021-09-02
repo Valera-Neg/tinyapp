@@ -1,5 +1,7 @@
+const bcrypt = require('bcrypt');
+
 const auth = (req, res, next) => {
-  if (!req.cookies.user_id) {
+  if (!req.session/*cookies*/.user_id) {
     res.redirect('/login');
   } else {
     next()
@@ -7,14 +9,19 @@ const auth = (req, res, next) => {
 }
 
 const notAuth = (req, res, next) => {
-  if (req.cookies.user_id) {
+  if (req.session/*cookies*/.user_id) {
     res.redirect('/urls');
   } else {
     next()
   }
 }
 
-// error handler
+const hashPass = (req, res, next)=> {
+  req.body.hashedPass = bcrypt.hashSync(req.body.password, 10);
+  next();
+}
+
+/***ERROR HANDLER****/
 
 const errorHandler = function(err, req, res, next) {
   if (!err.source) {
@@ -35,4 +42,4 @@ const errorHandler = function(err, req, res, next) {
   }
 }
 
-module.exports = { auth, errorHandler, notAuth}
+module.exports = { auth, errorHandler, notAuth, hashPass}

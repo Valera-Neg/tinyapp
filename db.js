@@ -1,5 +1,5 @@
 const users = {
-  "b2xVn2": {
+  /*"b2xVn2": {
     userID: "b2xVn2", 
     email: "user@example.com", 
     password: "example"
@@ -8,7 +8,7 @@ const users = {
     userID: "9sm5xK", 
     email: "user2@example.com", 
     password: "example"
-  }
+  }*/
 };
 
 const urlDatabase = {

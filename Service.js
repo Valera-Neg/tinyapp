@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 const { ServiceError } = require('./ServiceError');
 
 class Service {
@@ -10,7 +12,8 @@ class Service {
       throw new ServiceError('email or password are not provided', 400, 1)
     }
     try {
-      return this.model.createUser(email, password);
+      const hashedPassword = this.hashPass(password); 
+      return this.model.createUser(email, hashedPassword);
     } catch (error) {
       throw new ServiceError('invalid credentials, email should be unique', 409, 1)
     }
@@ -20,7 +23,7 @@ class Service {
     let user = this.model.readUserByEmail(email);
     if (!user) {
       throw new ServiceError('User with this email is not registered', 403, 2);
-    } else if (user.password === password) {
+    } else if (this.compareHashed(password, user.password)) {
       return user;
     } else {
       throw new ServiceError('Incorrect credentils', 409, 2);
@@ -41,46 +44,54 @@ class Service {
     }
   };
 
-fetchURLByID(userID) {
-  return this.model.readURLOfUser(userID);
-};
+  fetchURLByID(userID) {
+    return this.model.readURLOfUser(userID);
+  };
 
-getURL(shortURL) {
-  return this.model.readURL(shortURL);
-}
+  getURL(shortURL) {
+    return this.model.readURL(shortURL);
+  }
 
-getURLRestricted(shortURL, userID) {
-  if (!this.isURLOwner(shortURL, userID)) {
-    throw new ServiceError('No access rights', 403, 5)
+  getURLRestricted(shortURL, userID) {
+    if (!this.isURLOwner(shortURL, userID)) {
+      throw new ServiceError('No access rights', 403, 5)
+    }
+    return this.getURL(shortURL);
   }
-  return this.getURL(shortURL);
-}
 
-deleteURL(shortURL, userID) {
-  if (!this.isURLOwner(shortURL, userID)) {
-    throw new ServiceError('No access rights', 403, 5)
-  }
-  return this.model.deletURL(shortURL);
-};
+  deleteURL(shortURL, userID) {
+    if (!this.isURLOwner(shortURL, userID)) {
+      throw new ServiceError('No access rights', 403, 5)
+    }
+    return this.model.deletURL(shortURL);
+  };
 
-editURL(shortURL, longURL, userID) {
-  if (!this.isURLOwner(shortURL, userID)) {
-    throw new ServiceError('No access rights', 403, 5)
-  }
-  try {
-    return this.model.updateURL({shortURL, longURL, userID})
-  } catch (error) {
-    throw new ServiceError('URL is not provided', 400, 4)
-  }
-}
+  editURL(shortURL, longURL, userID) {
+    if (!this.isURLOwner(shortURL, userID)) {
+      throw new ServiceError('No access rights', 403, 5)
+    }
+    try {
+      return this.model.updateURL({shortURL, longURL, userID})
+    } catch (error) {
+      throw new ServiceError('URL is not provided', 400, 4)
+    }
+  };
 
-isURLOwner(shortURL, userID) {
-  if (this.getURL(shortURL) && this.getURL(shortURL).userID === userID) {
-    return true;
-  } else {
-    return false;
+  isURLOwner(shortURL, userID) {
+    if (this.getURL(shortURL) && this.getURL(shortURL).userID === userID) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  hashPass(password) {
+    return bcrypt.hashSync(password, 10);
+  };
+
+  compareHashed(password, hashedPassword) {
+    return bcrypt.compareSync(password, hashedPassword);
   }
-}
 };
 
 module.exports = { Service }
