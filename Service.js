@@ -20,7 +20,7 @@ class Service {
   };
 
   loginUser(email, password) {
-    let user = this.model.readUserByEmail(email);
+    let user = this.model.readUserByEmail(email); //return object { userID, email, password }
     if (!user) {
       throw new ServiceError('User with this email is not registered', 403, 2);
     } else if (this.compareHashed(password, user.password)) {
@@ -37,10 +37,10 @@ class Service {
   createNewURL(longURL, userID) {
     if (!longURL || !userID) {
       throw new ServiceError ('URL is not provided', 400, 3)
-    } else if (!this.model.readUserByID(userID)) {
-      throw new ServiceError ('The client does not have access rights to the content', 403, 0)
+    } else if (!this.model.readUserByID(userID)) { // return { userID, email, password }
+      throw new ServiceError ('The client does not have access rights to the content', 403, 0);
     } else {
-      return this.model.createURL(longURL, userID);
+      return this.model.createURL(longURL, userID); //return { sortURL, longURL, userID }
     }
   };
 
@@ -50,20 +50,20 @@ class Service {
 
   getURL(shortURL) {
     return this.model.readURL(shortURL);
-  }
+  };
 
   getURLRestricted(shortURL, userID) {
     if (!this.isURLOwner(shortURL, userID)) {
       throw new ServiceError('No access rights', 403, 5)
     }
     return this.getURL(shortURL);
-  }
+  };
 
   deleteURL(shortURL, userID) {
     if (!this.isURLOwner(shortURL, userID)) {
       throw new ServiceError('No access rights', 403, 5)
     }
-    return this.model.deletURL(shortURL);
+    return this.model.deletURL(shortURL); //return delited object { shortURL, longURL, userID }
   };
 
   editURL(shortURL, longURL, userID) {

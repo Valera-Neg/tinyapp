@@ -49,7 +49,7 @@ describe('#readUserByEmail()', () => {
       email: "caden.white@yahoo.com", 
       password: "pass3"
     })
-  })
+  });
   it ("readUserByEmail() should return a user object, but user does not exist", () =>{
     assert.deepEqual(mockModel.readUserByEmail("ppppppp"), null)
   })

@@ -77,7 +77,7 @@ describe('#createUser()', () => {
         password: newUser.password
       }
     })
-  })
+  });
   it ("createUser() should return a user object, but parameters are invalid", () =>{
     expect(function(){
       mockModel.createUser("ppppppp");

@@ -55,7 +55,7 @@ describe('#deletURL()', () => {
       "09NSYs": {longURL:"https://oshpark.com/", userID: "FgWRjO"},
       "f2qu0C": {longURL:"http://www.yahoo.com", userID: "FgWRjO"},
     })
-  })
+  });
   it ("deletURL() should delete URL from a database, but URL does not exist", () =>{
     assert.deepEqual(mockModel.deletURL(), null)
   })

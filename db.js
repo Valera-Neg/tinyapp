@@ -12,8 +12,8 @@ const users = {
 };
 
 const urlDatabase = {
-  "k1MjSN": {longURL:"http://www.lighthouselabs.ca", userID: "b2xVn2"},
-  "CvJ0Is": {longURL:"http://www.google.com", userID: "9sm5xK"}
+  // "k1MjSN": {longURL:"http://www.lighthouselabs.ca", userID: "b2xVn2"},
+  // "CvJ0Is": {longURL:"http://www.google.com", userID: "9sm5xK"}
 };
 
 module.exports = { users, urlDatabase };

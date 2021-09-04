@@ -55,7 +55,7 @@ describe('#createURL()', () => {
       "f2qu0C": {longURL:"http://www.yahoo.com", userID: "FgWRjO"},
       [newURL.shortURL]: {longURL: newURL.longURL, userID: newURL.userID}
     })
-  })
+  });
   it ("readURL() should attempt to create URL record, and fail", () =>{
     expect(function(){
       mockModel.createURL('https://gmail.com', '');
