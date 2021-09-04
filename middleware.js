@@ -37,4 +37,4 @@ const errorHandler = function(err, req, res, next) {
   }
 };
 
-module.exports = { auth, errorHandler, notAuth, hashPass}
+module.exports = { auth, errorHandler, notAuth }
