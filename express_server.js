@@ -5,13 +5,15 @@ const cookieSession = require('cookie-session')
 const {users: userDb, urlDatabase: urlDb} = require('./db')
 const { Model } = require('./Model');
 const { Service } = require('./Service');
-const middlewares = require('./middleware');
+const { EnvironmentWrapper } = require('./middleware');
 const bcrypt = require('bcrypt');
+const { ServiceError } = require('./ServiceError');
 
 
 /***INITIALIZING DATABASE AND SERVICE CLASSES***/
 const model = new Model(userDb, urlDb);
 const service = new Service(model);
+const middlewares = new EnvironmentWrapper(service);
 
 /***EXPRESS APP INITIALIZATION***/
 const app = express();
@@ -36,10 +38,12 @@ app.get("/", (req, res) => {
 /***URL ROUTES***/
 app.get("/urls", middlewares.auth, (req, res) => {
   res.render("urls_index", {urls: service.fetchURLByID(req.session.user_id.id),  user: req.session.user_id, error: null});
-});
+  });
 
 app.post("/urls", middlewares.auth, (req, res) => {
-  let newURL = service.createNewURL(req.body.longURL, req.session.user_id.id); //newURL is object: { shortURL, longURL, userID }
+  let userId;
+  req.session.user_id && service.findUserByID(req.session.user_id.id) ? userId = req.session.user_id.id : userId = null;
+  let newURL = service.createNewURL(req.body.longURL, userId); //newURL is object: { shortURL, longURL, userID }
   res.redirect(`/urls/${newURL.shortURL}`); 
 });
 
@@ -79,13 +83,11 @@ app.post("/urls/:shortURL", middlewares.auth, (req, res) => {
 });
 
 /***URL EDIT***/
-app.get("/urls/:shortURL",  (req, res, next) => {
-  let url = service.getURLRestricted(req.params.shortURL, req.session.user_id.id);
-  if (url === null) {
-    next();
-  } else {
-    res.render("urls_show", {url, user: req.session.user_id, error: null});
-  }
+app.get("/urls/:shortURL", (req, res, next) => {
+  let userId;
+  req.session.user_id && service.findUserByID(req.session.user_id.id) ? userId = req.session.user_id.id : userId = null;
+  let url = service.getURLRestricted(req.params.shortURL, userId);
+  res.render("urls_show", {url, user: req.session.user_id, error: null});
 });
 app.post("/url/:shortURL", middlewares.auth, (req, res) => {
   req.body.url = { shortURL: req.params.shortURL, longURL: service.getURL(req.params.shortURL).longURL }

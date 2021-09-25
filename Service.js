@@ -31,13 +31,13 @@ class Service {
   };
 
   findUserByID(userID) {
-    return readUserByID(userID);
+    return this.model.readUserByID(userID);
   };
 
   createNewURL(longURL, userID) {
-    if (!longURL || !userID) {
+    if (!longURL) {
       throw new ServiceError ('URL is not provided', 400, 3)
-    } else if (!this.model.readUserByID(userID)) { // return { userID, email, password }
+    } else if (!userID || !this.model.readUserByID(userID)) { // return { userID, email, password }
       throw new ServiceError ('The client does not have access rights to the content', 403, 0);
     } else {
       return this.model.createURL(longURL, userID); //return { sortURL, longURL, userID }
@@ -53,7 +53,10 @@ class Service {
   };
 
   getURLRestricted(shortURL, userID) {
-    if (!this.isURLOwner(shortURL, userID)) {
+    if(!this.getURL(shortURL)){
+      throw new ServiceError('URL does not exist', 404, 5)
+    }
+    if (!userID || !this.isURLOwner(shortURL, userID)) {
       throw new ServiceError('No access rights', 403, 5)
     }
     return this.getURL(shortURL);
